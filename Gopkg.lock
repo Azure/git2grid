@@ -8,6 +8,12 @@
   revision = "40e40b42552a9cb37d6e98f4ad31f63ae53ea43a"
 
 [[projects]]
+  name = "github.com/Azure/azure-sdk-for-go"
+  packages = ["."]
+  revision = "cd93ccfe0395e70031704ca68f14606588eec120"
+  version = "v17.3.0"
+
+[[projects]]
   name = "github.com/BurntSushi/toml"
   packages = ["."]
   revision = "b26d9c308763d68093482582cea63d69be07a0f0"
@@ -479,6 +485,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "34bd1c421d3843cc555dd4c2668e661cdc268bdd64898e9069bea2b52bdc800a"
+  inputs-digest = "8c05f05304e1d2bccf1a30ea752f8603d10d1a4025e889ebb6417b83e9f537f8"
   solver-name = "gps-cdcl"
   solver-version = 1

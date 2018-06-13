@@ -52,3 +52,7 @@
 [prune]
   go-tests = true
   unused-packages = true
+
+[[constraint]]
+  name = "github.com/Azure/azure-sdk-for-go"
+  version = "17.3.0"
