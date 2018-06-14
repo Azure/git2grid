@@ -1,7 +1,6 @@
 package actions
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -40,7 +39,22 @@ func HomeHandler(c buffalo.Context) error {
 	case *github.PullRequestEvent:
 		if e.Action != nil {
 			repoName = *e.Repo.FullName
-			fmt.Printf("Repository Name: %s", *e.Repo.FullName)
+			myEvent = eventgrid.Event{
+				EventType:       to.StringPtr(os.Getenv("EVENT_TYPE")),
+				EventTime:       &myDate,
+				ID:              to.StringPtr(os.Getenv("ID")),
+				Data:            e,
+				Subject:         e.PullRequest.URL,
+				DataVersion:     to.StringPtr(""),
+				MetadataVersion: to.StringPtr("1"),
+			}
+			events = append(events, myEvent)
+			repoName = *e.Repo.FullName
+			result, err := eventgrid.BaseClient.PublishEvents(myClient, request.Context(), "specsla.westus2-1.eventgrid.azure.net", events)
+			if err != nil {
+				log.Printf("could not parse webhook: err=%s\n", err)
+				return c.Error(result.Response.StatusCode, err)
+			}
 		}
 	case *github.LabelEvent:
 		if e.Action != nil {
@@ -66,5 +80,4 @@ func HomeHandler(c buffalo.Context) error {
 		//return err
 	}
 	return c.Render(200, render.JSON(map[string]string{"message": "Welcome to Buffalo!", "repo name": repoName}))
-
 }
