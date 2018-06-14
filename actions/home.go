@@ -40,9 +40,9 @@ func HomeHandler(c buffalo.Context) error {
 		if e.Action != nil {
 			repoName = *e.Repo.FullName
 			myEvent = eventgrid.Event{
-				EventType:       to.StringPtr(os.Getenv("EVENT_TYPE")),
+				EventType:       to.StringPtr(os.Getenv("APPSETTING_EVENT_TYPE")),
 				EventTime:       &myDate,
-				ID:              to.StringPtr(os.Getenv("ID")),
+				ID:              to.StringPtr(os.Getenv("APPSETTING_ID")),
 				Data:            e,
 				Subject:         e.PullRequest.URL,
 				DataVersion:     to.StringPtr(""),
@@ -59,9 +59,9 @@ func HomeHandler(c buffalo.Context) error {
 	case *github.LabelEvent:
 		if e.Action != nil {
 			myEvent = eventgrid.Event{
-				EventType:       to.StringPtr(os.Getenv("EVENT_TYPE")),
+				EventType:       to.StringPtr(os.Getenv("APPSETTING_EVENT_TYPE")),
 				EventTime:       &myDate,
-				ID:              to.StringPtr(os.Getenv("ID")),
+				ID:              to.StringPtr(os.Getenv("APPSETTING_ID")),
 				Data:            e,
 				Subject:         e.Label.URL,
 				DataVersion:     to.StringPtr(""),
