@@ -50,7 +50,7 @@ func HomeHandler(c buffalo.Context) error {
 			}
 			events = append(events, myEvent)
 			repoName = *e.Repo.FullName
-			result, err := eventgrid.BaseClient.PublishEvents(myClient, request.Context(), "specsla.westus2-1.eventgrid.azure.net", events)
+			result, err := eventgrid.BaseClient.PublishEvents(myClient, request.Context(), os.Getenv("APPSETTING_TOPIC_HOSTNAME"), events)
 			if err != nil {
 				log.Printf("Could not publish pull request event to event grid: err=%s\n", err)
 				return c.Error(result.Response.StatusCode, err)
@@ -69,7 +69,7 @@ func HomeHandler(c buffalo.Context) error {
 			}
 			events = append(events, myEvent)
 			repoName = *e.Repo.FullName
-			result, err := eventgrid.BaseClient.PublishEvents(myClient, request.Context(), "specsla.westus2-1.eventgrid.azure.net", events)
+			result, err := eventgrid.BaseClient.PublishEvents(myClient, request.Context(), os.Getenv("APPSETTING_TOPIC_HOSTNAME"), events)
 			if err != nil {
 				log.Printf("Could not publish label event to event grid: err=%s\n", err)
 				return c.Error(result.Response.StatusCode, err)
