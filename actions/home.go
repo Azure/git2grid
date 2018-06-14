@@ -49,7 +49,6 @@ func HomeHandler(c buffalo.Context) error {
 				MetadataVersion: to.StringPtr("1"),
 			}
 			events = append(events, myEvent)
-			repoName = *e.Repo.FullName
 			result, err := eventgrid.BaseClient.PublishEvents(myClient, request.Context(), os.Getenv("APPSETTING_TOPIC_HOSTNAME"), events)
 			if err != nil {
 				log.Printf("Could not publish pull request event to event grid: err=%s\n", err)
@@ -58,6 +57,7 @@ func HomeHandler(c buffalo.Context) error {
 		}
 	case *github.LabelEvent:
 		if e.Action != nil {
+			repoName = *e.Repo.FullName
 			myEvent = eventgrid.Event{
 				EventType:       to.StringPtr(os.Getenv("APPSETTING_EVENT_TYPE")),
 				EventTime:       &myDate,
@@ -68,7 +68,6 @@ func HomeHandler(c buffalo.Context) error {
 				MetadataVersion: to.StringPtr("1"),
 			}
 			events = append(events, myEvent)
-			repoName = *e.Repo.FullName
 			result, err := eventgrid.BaseClient.PublishEvents(myClient, request.Context(), os.Getenv("APPSETTING_TOPIC_HOSTNAME"), events)
 			if err != nil {
 				log.Printf("Could not publish label event to event grid: err=%s\n", err)
