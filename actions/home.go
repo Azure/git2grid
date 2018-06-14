@@ -5,7 +5,11 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
+	"github.com/Azure/azure-sdk-for-go/services/eventgrid/2018-01-01/eventgrid"
+	"github.com/Azure/go-autorest/autorest/date"
+	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/gobuffalo/buffalo"
 	"github.com/gobuffalo/buffalo/render"
 	"github.com/google/go-github/github"
@@ -27,6 +31,10 @@ func HomeHandler(c buffalo.Context) error {
 		return c.Error(http.StatusInternalServerError, err)
 	}
 	repoName := ""
+	var myEvent eventgrid.Event
+	myDate := date.Time{Time: time.Now()}
+	var events []eventgrid.Event
+	var myClient = eventgrid.New()
 	switch e := event.(type) {
 	case *github.PullRequestEvent:
 		if e.Action != nil {
@@ -35,11 +43,27 @@ func HomeHandler(c buffalo.Context) error {
 		}
 	case *github.LabelEvent:
 		if e.Action != nil {
+			myEvent = eventgrid.Event{
+				EventType:       to.StringPtr(os.Getenv("EVENT_TYPE")),
+				EventTime:       &myDate,
+				ID:              to.StringPtr(os.Getenv("ID")),
+				Data:            e,
+				Subject:         e.Label.URL,
+				DataVersion:     to.StringPtr(""),
+				MetadataVersion: to.StringPtr("1"),
+			}
+			events = append(events, myEvent)
 			repoName = *e.Repo.FullName
+			result, err := eventgrid.BaseClient.PublishEvents(myClient, request.Context(), "/specsla.westus2-1.eventgrid.azure.net/api/events", events)
+			if err != nil {
+				log.Printf("could not parse webhook: err=%s\n", err)
+				return c.Error(result.Response.StatusCode, err)
+			}
 		}
 	default:
 		log.Printf("unknown event type %s\n", github.WebHookType(request))
 		//return err
 	}
 	return c.Render(200, render.JSON(map[string]string{"message": "Welcome to Buffalo!", "repo name": repoName}))
+
 }

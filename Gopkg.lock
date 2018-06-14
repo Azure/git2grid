@@ -9,9 +9,24 @@
 
 [[projects]]
   name = "github.com/Azure/azure-sdk-for-go"
-  packages = ["."]
+  packages = [
+    "services/eventgrid/2018-01-01/eventgrid",
+    "version"
+  ]
   revision = "cd93ccfe0395e70031704ca68f14606588eec120"
   version = "v17.3.0"
+
+[[projects]]
+  name = "github.com/Azure/go-autorest"
+  packages = [
+    "autorest",
+    "autorest/adal",
+    "autorest/azure",
+    "autorest/date",
+    "autorest/validation"
+  ]
+  revision = "76796dcb80ab6491bf22e344402023c081a7a282"
+  version = "v10.11.1"
 
 [[projects]]
   name = "github.com/BurntSushi/toml"
@@ -36,6 +51,12 @@
   packages = ["spew"]
   revision = "346938d642f2ec3594ed81d874461961cd0faa76"
   version = "v1.1.0"
+
+[[projects]]
+  name = "github.com/dgrijalva/jwt-go"
+  packages = ["."]
+  revision = "06ea1031745cb8b3dab3f6a236daf2b0aa468b7e"
+  version = "v3.2.0"
 
 [[projects]]
   branch = "master"
@@ -167,6 +188,18 @@
     "sessions"
   ]
   revision = "11ca13c05abd73167c56ed10f8874c7c7497f759"
+
+[[projects]]
+  name = "github.com/google/go-github"
+  packages = ["github"]
+  revision = "e48060a28fac52d0f1cb758bc8b87c07bac4a87d"
+  version = "v15.0.0"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/google/go-querystring"
+  packages = ["query"]
+  revision = "53e6ce116135b80d037921a7fdd5138cf32d7a8a"
 
 [[projects]]
   name = "github.com/gorilla/context"
@@ -485,6 +518,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "8c05f05304e1d2bccf1a30ea752f8603d10d1a4025e889ebb6417b83e9f537f8"
+  inputs-digest = "bb37e9fcb3f1eef00a41d377df7b708d654510c040154d84c9978fc23dd392d7"
   solver-name = "gps-cdcl"
   solver-version = 1
