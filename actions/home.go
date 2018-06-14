@@ -32,6 +32,7 @@ func HomeHandler(c buffalo.Context) error {
 	}
 	repoName := ""
 	var myEvent eventgrid.Event
+	//can take address of myDate directly because it is a local variable
 	myDate := date.Time{Time: time.Now()}
 	var events []eventgrid.Event
 	var myClient = eventgrid.New()
@@ -54,7 +55,7 @@ func HomeHandler(c buffalo.Context) error {
 			}
 			events = append(events, myEvent)
 			repoName = *e.Repo.FullName
-			result, err := eventgrid.BaseClient.PublishEvents(myClient, request.Context(), "/specsla.westus2-1.eventgrid.azure.net/api/events", events)
+			result, err := eventgrid.BaseClient.PublishEvents(myClient, request.Context(), "specsla.westus2-1.eventgrid.azure.net", events)
 			if err != nil {
 				log.Printf("could not parse webhook: err=%s\n", err)
 				return c.Error(result.Response.StatusCode, err)
