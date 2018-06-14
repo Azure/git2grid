@@ -52,7 +52,7 @@ func HomeHandler(c buffalo.Context) error {
 			repoName = *e.Repo.FullName
 			result, err := eventgrid.BaseClient.PublishEvents(myClient, request.Context(), "specsla.westus2-1.eventgrid.azure.net", events)
 			if err != nil {
-				log.Printf("could not parse webhook: err=%s\n", err)
+				log.Printf("Could not publish pull request event to event grid: err=%s\n", err)
 				return c.Error(result.Response.StatusCode, err)
 			}
 		}
@@ -71,7 +71,7 @@ func HomeHandler(c buffalo.Context) error {
 			repoName = *e.Repo.FullName
 			result, err := eventgrid.BaseClient.PublishEvents(myClient, request.Context(), "specsla.westus2-1.eventgrid.azure.net", events)
 			if err != nil {
-				log.Printf("could not parse webhook: err=%s\n", err)
+				log.Printf("Could not publish label event to event grid: err=%s\n", err)
 				return c.Error(result.Response.StatusCode, err)
 			}
 		}
