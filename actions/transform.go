@@ -53,7 +53,7 @@ func TransformListen(c buffalo.Context) error {
 				ID:              to.StringPtr(os.Getenv("APPSETTING_ID")),
 				Data:            e,
 				Subject:         e.PullRequest.URL,
-				DataVersion:     to.StringPtr(""),
+				DataVersion:     to.StringPtr("1"),
 				MetadataVersion: to.StringPtr("1"),
 			}
 			events = append(events, myEvent)
@@ -72,7 +72,7 @@ func TransformListen(c buffalo.Context) error {
 				ID:              to.StringPtr(os.Getenv("APPSETTING_ID")),
 				Data:            e,
 				Subject:         e.Label.URL,
-				DataVersion:     to.StringPtr(""),
+				DataVersion:     to.StringPtr("11"),
 				MetadataVersion: to.StringPtr("1"),
 			}
 			events = append(events, myEvent)
