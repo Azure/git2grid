@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/services/eventgrid/2018-01-01/eventgrid"
+	"github.com/Azure/go-autorest/autorest"
 	"github.com/Azure/go-autorest/autorest/date"
 	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/gobuffalo/buffalo"
@@ -41,6 +42,7 @@ func TransformListen(c buffalo.Context) error {
 	myDate := date.Time{Time: time.Now()}
 	var events []eventgrid.Event
 	var myClient = eventgrid.New()
+	myClient.Authorizer = autorest.NewEventGridKeyAuthorizer(os.Getenv("APPSETTING_TOPIC_KEY"))
 	switch e := event.(type) {
 	case *github.PullRequestEvent:
 		if e.Action != nil {
