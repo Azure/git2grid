@@ -15,8 +15,8 @@ import (
 	"github.com/google/go-github/github"
 )
 
-// EventListen default implementation.
-func EventListen(c buffalo.Context) error {
+// TransformListen default implementation.
+func TransformListen(c buffalo.Context) error {
 	request := c.Request()
 	/*payload, err := github.ValidatePayload(request, []byte(os.Getenv("APPSETTING_X_HUB_SIGNATURE")))
 	if err != nil {

@@ -43,8 +43,7 @@ func App() *buffalo.App {
 		}
 
 		app.GET("/", HomeHandler)
-		app.POST("/event/listen", EventListen)
-
+		app.POST("/transform/listen", TransformListen)
 	}
 
 	return app
