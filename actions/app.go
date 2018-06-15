@@ -42,7 +42,8 @@ func App() *buffalo.App {
 			app.Use(middleware.ParameterLogger)
 		}
 
-		app.POST("/", HomeHandler)
+		app.GET("/", HomeHandler)
+		app.POST("/event/listen", EventListen)
 
 	}
 
