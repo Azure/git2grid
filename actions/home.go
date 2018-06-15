@@ -1,6 +1,7 @@
 package actions
 
 import (
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -18,13 +19,18 @@ import (
 // a home page.
 func HomeHandler(c buffalo.Context) error {
 	request := c.Request()
-	payload, err := github.ValidatePayload(request, []byte(os.Getenv("APPSETTING_X_HUB_SIGNATURE")))
+	/*payload, err := github.ValidatePayload(request, []byte(os.Getenv("APPSETTING_X_HUB_SIGNATURE")))
 	if err != nil {
 		log.Printf("secret key is not correct: err=%s\n", err)
 		return c.Error(http.StatusInternalServerError, err)
+	}*/
+	var err error
+	var body []byte
+	if body, err = ioutil.ReadAll(request.Body); err != nil {
+		return err
 	}
 	defer request.Body.Close()
-	event, err := github.ParseWebHook(github.WebHookType(request), payload)
+	event, err := github.ParseWebHook(github.WebHookType(request), body)
 	if err != nil {
 		log.Printf("could not parse webhook: err=%s\n", err)
 		return c.Error(http.StatusInternalServerError, err)
