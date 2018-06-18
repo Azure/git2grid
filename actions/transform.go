@@ -68,7 +68,7 @@ func TransformListen(c buffalo.Context) error {
 		if e.Action != nil {
 			//repoName = *e.Repo.FullName
 			myEvent = eventgrid.Event{
-				EventType:       to.StringPtr(os.Getenv("APPSETTING_EVENT_TYPE")),
+				EventType:       to.StringPtr("Github.LabelEvent"),
 				EventTime:       &myDate,
 				ID:              to.StringPtr(os.Getenv("APPSETTING_ID")),
 				Data:            e,
