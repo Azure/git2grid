@@ -36,7 +36,8 @@ func TransformListen(c buffalo.Context) error {
 		log.Printf("could not parse webhook: err=%s\n", err)
 		return c.Error(http.StatusInternalServerError, err)
 	}
-	repoName := ""
+	//c.Logger().Debug("MADE IT")
+	//repoName := ""
 	var myEvent eventgrid.Event
 	//can take address of myDate directly because it is a local variable
 	myDate := date.Time{Time: time.Now()}
@@ -46,7 +47,7 @@ func TransformListen(c buffalo.Context) error {
 	switch e := event.(type) {
 	case *github.PullRequestEvent:
 		if e.Action != nil {
-			repoName = *e.Repo.FullName
+			//repoName = *e.Repo.FullName
 			myEvent = eventgrid.Event{
 				EventType:       to.StringPtr(os.Getenv("APPSETTING_EVENT_TYPE")),
 				EventTime:       &myDate,
@@ -57,7 +58,7 @@ func TransformListen(c buffalo.Context) error {
 				MetadataVersion: to.StringPtr("1"),
 			}
 			events = append(events, myEvent)
-			result, err := eventgrid.BaseClient.PublishEvents(myClient, request.Context(), os.Getenv("APPSETTING_TOPIC_HOSTNAME"), events)
+			result, err := myClient.PublishEvents(request.Context(), os.Getenv("APPSETTING_TOPIC_HOSTNAME"), events)
 			if err != nil {
 				log.Printf("Could not publish pull request event to event grid: err=%s\n", err)
 				return c.Error(result.Response.StatusCode, err)
@@ -65,7 +66,7 @@ func TransformListen(c buffalo.Context) error {
 		}
 	case *github.LabelEvent:
 		if e.Action != nil {
-			repoName = *e.Repo.FullName
+			//repoName = *e.Repo.FullName
 			myEvent = eventgrid.Event{
 				EventType:       to.StringPtr(os.Getenv("APPSETTING_EVENT_TYPE")),
 				EventTime:       &myDate,
@@ -76,7 +77,7 @@ func TransformListen(c buffalo.Context) error {
 				MetadataVersion: to.StringPtr("1"),
 			}
 			events = append(events, myEvent)
-			result, err := eventgrid.BaseClient.PublishEvents(myClient, request.Context(), os.Getenv("APPSETTING_TOPIC_HOSTNAME"), events)
+			result, err := myClient.PublishEvents(request.Context(), os.Getenv("APPSETTING_TOPIC_HOSTNAME"), events)
 			if err != nil {
 				log.Printf("Could not publish label event to event grid: err=%s\n", err)
 				return c.Error(result.Response.StatusCode, err)
@@ -86,5 +87,5 @@ func TransformListen(c buffalo.Context) error {
 		log.Printf("unknown event type %s\n", github.WebHookType(request))
 		//return err
 	}
-	return c.Render(200, render.JSON(map[string]string{"message": "Welcome to Buffalo!", "repo name": repoName}))
+	return c.Render(200, render.JSON([]eventgrid.Event{myEvent}))
 }
