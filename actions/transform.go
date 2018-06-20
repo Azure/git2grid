@@ -41,7 +41,7 @@ func TransformListen(c buffalo.Context) error {
 
 	var myClient = eventgrid.New()
 	myClient.Authorizer = autorest.NewEventGridKeyAuthorizer(os.Getenv("APPSETTING_TOPIC_KEY"))
-	eventName := formatEventName(github.WebHookType(request))
+	eventName := FormatEventName(github.WebHookType(request))
 
 	eventType := fmt.Sprintf("Github.%s", eventName)
 
@@ -64,7 +64,7 @@ func TransformListen(c buffalo.Context) error {
 	return c.Render(200, render.JSON([]eventgrid.Event{myEvent}))
 }
 
-func formatEventName(name string) string {
+func FormatEventName(name string) string {
 	sepName := strings.Split(name, "_")
 	for i, v := range sepName {
 		sepName[i] = strings.Title(v)
