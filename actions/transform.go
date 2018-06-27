@@ -42,6 +42,8 @@ func TransformListen(c buffalo.Context) error {
 	var myClient = eventgrid.New()
 	myClient.Authorizer = autorest.NewEventGridKeyAuthorizer(os.Getenv("APPSETTING_TOPIC_KEY"))
 	eventName := FormatEventName(github.WebHookType(request))
+	c.Logger().Debug(github.WebHookType(request))
+	c.Logger().Debug(eventName)
 
 	eventType := fmt.Sprintf("Github.%s", eventName)
 
