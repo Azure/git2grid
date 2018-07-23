@@ -2,8 +2,8 @@
 # https://docs.docker.com/engine/userguide/eng-image/multistage-build/
 FROM gobuffalo/buffalo:v0.11.1 as builder
 
-RUN mkdir -p $GOPATH/src/github.com/Azure/gittogrid
-WORKDIR $GOPATH/src/github.com/Azure/gittogrid
+RUN mkdir -p $GOPATH/src/github.com/Azure/git2grid
+WORKDIR $GOPATH/src/github.com/Azure/git2grid
 
 ADD . .
 RUN dep ensure

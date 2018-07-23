@@ -18,7 +18,7 @@ import (
 	"github.com/google/go-github/github"
 )
 
-// TransformListen converts a Github event into an Eventgrid event and published the event to Eventgrid
+// TransformListen converts a Github event into an Eventgrid event and publishes the event to Eventgrid
 func TransformListen(c buffalo.Context) error {
 	request := c.Request()
 	/*payload, err := github.ValidatePayload(request, []byte(os.Getenv("APPSETTING_X_HUB_SIGNATURE")))
@@ -42,8 +42,6 @@ func TransformListen(c buffalo.Context) error {
 	var myClient = eventgrid.New()
 	myClient.Authorizer = autorest.NewEventGridKeyAuthorizer(os.Getenv("APPSETTING_TOPIC_KEY"))
 	eventName := FormatEventName(github.WebHookType(request))
-	c.Logger().Debug(github.WebHookType(request))
-	c.Logger().Debug(eventName)
 
 	eventType := fmt.Sprintf("Github.%s", eventName)
 

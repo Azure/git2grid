@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"github.com/Azure/gittogrid/actions"
+	"github.com/Azure/git2grid/actions"
 )
 
 func main() {
