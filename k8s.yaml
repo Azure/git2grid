@@ -1,0 +1,80 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: git2grid
+  namespace: git2grid
+spec:
+  replicas: 3
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  minReadySeconds: 5
+  template:
+    metadata:
+      labels:
+        app: git2grid
+        role: git2grid
+    spec:
+      containers:
+        - name: git2grid
+          image: billytrend/git2grid:latest
+          ports:
+            - containerPort: 443
+          env:
+            - name: NODE_ENV
+              value: "production"
+            - name: webhookSecret
+              valueFrom:
+                secretKeyRef:
+                  name: git2grid-secrets
+                  key: webhook-secret
+            - name: eventgridSecret
+              valueFrom:
+                secretKeyRef:
+                  name: git2grid-secrets
+                  key: eventgrid-secret
+          readinessProbe:
+            httpGet:
+              path: /api/alive
+              port: 443
+              scheme: HTTPS
+            initialDelaySeconds: 5
+            timeoutSeconds: 2
+            periodSeconds: 5
+            failureThreshold: 2
+            successThreshold: 2
+          livenessProbe:
+            httpGet:
+              path: /api/alive
+              port: 443
+              scheme: HTTPS
+            initialDelaySeconds: 5
+            timeoutSeconds: 5
+            periodSeconds: 60
+            successThreshold: 1
+            failureThreshold: 5
+      # volumes:
+      #   - name: certs
+      #     secret:
+      #       secretName: cert-ssl
+      #       items:
+      #         - key: tls.crt
+      #           path: cert_sslcrt.pem
+      #         - key: tls.key
+      #           path: cert_ssl.key
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: git2grid
+  namespace: git2grid
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 3000
+      targetPort: 3000
+      name: "http"
+  selector:
+    app: git2grid
+    role: git2grid
