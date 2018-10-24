@@ -147,15 +147,6 @@
   version = "v4.5.9"
 
 [[projects]]
-  name = "github.com/gobuffalo/suite"
-  packages = [
-    ".",
-    "fix"
-  ]
-  revision = "e2e0134eb87394466461f262c7cb7027b9e332e0"
-  version = "v2.1.1"
-
-[[projects]]
   name = "github.com/gobuffalo/tags"
   packages = [
     ".",

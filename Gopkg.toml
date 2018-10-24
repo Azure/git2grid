@@ -34,18 +34,6 @@
   version = "1.6.3"
 
 [[constraint]]
-  name = "github.com/gobuffalo/suite"
-  version = "2.1.1"
-
-[[constraint]]
-  branch = "master"
-  name = "github.com/gobuffalo/x"
-
-[[constraint]]
-  name = "github.com/rs/cors"
-  version = "1.4.0"
-
-[[constraint]]
   branch = "master"
   name = "github.com/unrolled/secure"
 
