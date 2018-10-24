@@ -20,10 +20,10 @@ import (
 
 // GithookReceiver converts a Github event into an Eventgrid event and publishes the event to Eventgrid
 func GithookReceiver(c buffalo.Context) error {
-	webhookSecret := os.Getenv("webhookSecret");
-	eventgridSecret := os.Getenv("eventgridSecret");
-	eventgridEndpoint := os.Getenv("eventgridEndpoint");
-	
+	webhookSecret := os.Getenv("webhookSecret")
+	eventgridSecret := os.Getenv("eventgridSecret")
+	eventgridEndpoint := os.Getenv("eventgridEndpoint")
+
 	request := c.Request()
 
 	// save request body so it can be read multiple times
@@ -37,7 +37,7 @@ func GithookReceiver(c buffalo.Context) error {
 
 	// validate githook using secret
 	_, err := github.ValidatePayload(request, []byte(webhookSecret))
-	
+
 	if err != nil {
 		log.Printf("Validation failed: err=%s\n", err)
 		return c.Error(http.StatusInternalServerError, err)
