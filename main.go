@@ -3,11 +3,11 @@ package main
 import (
 	"log"
 
-	"github.com/Azure/git2grid/server"
+	"github.com/Azure/git2grid/actions"
 )
 
 func main() {
-	app := server.App()
+	app := actions.App()
 
 	if err := app.Serve(); err != nil {
 		log.Fatal(err)
