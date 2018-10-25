@@ -2,9 +2,11 @@ package actions
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/services/eventgrid/2018-01-01/eventgrid"
@@ -31,27 +33,27 @@ func GithookReceiver(c buffalo.Context) error {
 
 	if request.Body != nil {
 		// max expected body is 25 megabytes
-		var thirtyMegaBytes int64 = 30000000
+		var thirtyMegaBytes int64 = 30 * 1024 * 1024
 		limitReader := io.LimitReader(request.Body, thirtyMegaBytes)
 		bodyBytes, _ = ioutil.ReadAll(limitReader)
 	}
 
+	defer request.Body.Close()
 	request.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
 
 	// validate githook using secret
 	_, err := github.ValidatePayload(request, []byte(webhookSecret))
 
 	if err != nil {
-		c.Logger().Errorf("Validation failed: err=%s\n", err)
+		c.Logger().Errorf("validation failed: err=%s\n", err)
 		return c.Error(http.StatusInternalServerError, err)
 	}
 
 	// parse webhook body
-	defer request.Body.Close()
 	event, err := github.ParseWebHook(github.WebHookType(request), bodyBytes)
 
 	if err != nil {
-		c.Logger().Errorf("Could not parse webhook body: err=%s\n", err)
+		c.Logger().Errorf("could not parse webhook body: err=%s\n", err)
 		return c.Error(http.StatusInternalServerError, err)
 	}
 
@@ -63,12 +65,14 @@ func GithookReceiver(c buffalo.Context) error {
 	uuidBytes := uuid.NewV4()
 	var uuidString = string(uuidBytes[:16])
 
+	var subject = fmt.Sprintf("/webhook/%s", github.WebHookType(request))
+
 	myEvent := eventgrid.Event{
 		EventType:       to.StringPtr(github.WebHookType(request)),
 		EventTime:       &now,
 		ID:              to.StringPtr(uuidString),
 		Data:            event,
-		Subject:         to.StringPtr("GitToGrid"),
+		Subject:         to.StringPtr(subject),
 		DataVersion:     to.StringPtr("1"),
 		MetadataVersion: to.StringPtr("1"),
 	}
@@ -79,9 +83,18 @@ func GithookReceiver(c buffalo.Context) error {
 	result, err := eventgridClient.PublishEvents(request.Context(), eventgridEndpoint, events)
 
 	if err != nil {
-		c.Logger().Errorf("Could not publish %s event to event grid: err=%s\n", github.WebHookType(request), err)
+		c.Logger().Errorf("could not publish %s event to event grid: err=%s\n", github.WebHookType(request), err)
 		return c.Error(result.Response.StatusCode, err)
 	}
 
 	return c.Render(200, render.JSON([]eventgrid.Event{myEvent}))
+}
+
+func FormatSubjectName(name string) string {
+	sepName := strings.Split(name, "_")
+	for i, v := range sepName {
+		sepName[i] = strings.Title(v)
+	}
+	sepName = append(sepName, "Event")
+	return strings.Join(sepName, "")
 }
