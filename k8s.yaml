@@ -25,7 +25,10 @@ spec:
             - name: GO_ENV
               value: "production"
             - name: eventgridEndpoint
-              value: "gridfromgit.westus2-1.eventgrid.azure.net"
+              valueFrom:
+                secretKeyRef:
+                  name: git2grid-secrets
+                  key: eventgrid-endpoint
             - name: webhookSecret
               valueFrom:
                 secretKeyRef:

@@ -1,11 +1,10 @@
-package server
+package actions
 
 import (
 	"bytes"
+	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/services/eventgrid/2018-01-01/eventgrid"
@@ -14,15 +13,16 @@ import (
 	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/gobuffalo/buffalo"
 	"github.com/gobuffalo/buffalo/render"
+	"github.com/gobuffalo/envy"
 	"github.com/google/go-github/github"
-	"github.com/google/uuid"
+	"github.com/satori/go.uuid"
 )
 
 // GithookReceiver converts a Github event into an Eventgrid event and publishes the event to Eventgrid
 func GithookReceiver(c buffalo.Context) error {
-	webhookSecret := os.Getenv("webhookSecret")
-	eventgridSecret := os.Getenv("eventgridSecret")
-	eventgridEndpoint := os.Getenv("eventgridEndpoint")
+	webhookSecret := envy.Get("webhookSecret", "")
+	eventgridSecret := envy.Get("eventgridSecret", "")
+	eventgridEndpoint := envy.Get("eventgridEndpoint", "")
 
 	request := c.Request()
 
@@ -30,7 +30,10 @@ func GithookReceiver(c buffalo.Context) error {
 	var bodyBytes []byte
 
 	if request.Body != nil {
-		bodyBytes, _ = ioutil.ReadAll(request.Body)
+		// max expected body is 25 megabytes
+		var thirtyMegaBytes int64 = 30000000
+		limitReader := io.LimitReader(request.Body, thirtyMegaBytes)
+		bodyBytes, _ = ioutil.ReadAll(limitReader)
 	}
 
 	request.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
@@ -39,7 +42,7 @@ func GithookReceiver(c buffalo.Context) error {
 	_, err := github.ValidatePayload(request, []byte(webhookSecret))
 
 	if err != nil {
-		log.Printf("Validation failed: err=%s\n", err)
+		c.Logger().Errorf("Validation failed: err=%s\n", err)
 		return c.Error(http.StatusInternalServerError, err)
 	}
 
@@ -48,7 +51,7 @@ func GithookReceiver(c buffalo.Context) error {
 	event, err := github.ParseWebHook(github.WebHookType(request), bodyBytes)
 
 	if err != nil {
-		log.Printf("Could not parse webhook body: err=%s\n", err)
+		c.Logger().Errorf("Could not parse webhook body: err=%s\n", err)
 		return c.Error(http.StatusInternalServerError, err)
 	}
 
@@ -57,7 +60,7 @@ func GithookReceiver(c buffalo.Context) error {
 	eventgridClient.Authorizer = autorest.NewEventGridKeyAuthorizer(eventgridSecret)
 
 	var now = date.Time{Time: time.Now()}
-	var uuidBytes, _ = uuid.NewRandom()
+	uuidBytes := uuid.NewV4()
 	var uuidString = string(uuidBytes[:16])
 
 	myEvent := eventgrid.Event{
@@ -76,7 +79,7 @@ func GithookReceiver(c buffalo.Context) error {
 	result, err := eventgridClient.PublishEvents(request.Context(), eventgridEndpoint, events)
 
 	if err != nil {
-		log.Printf("Could not publish %s event to event grid: err=%s\n", github.WebHookType(request), err)
+		c.Logger().Errorf("Could not publish %s event to event grid: err=%s\n", github.WebHookType(request), err)
 		return c.Error(result.Response.StatusCode, err)
 	}
 
